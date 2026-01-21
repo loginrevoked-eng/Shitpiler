@@ -1,14 +1,15 @@
-# Real-Time Interpreter System
+# Kyle Language Compiler
 
-A simple compiler/interpreter pipeline that converts custom source code to Python and executes it. This is an educational project demonstrating basic interpreter implementation principles.
+A simple compiler/interpreter for the Kyle programming language (`.kyle` files). This is an educational project demonstrating basic interpreter implementation principles with a custom language syntax.
 
 ## Overview
 
 This project implements a basic interpreter with:
-- **Lexical Analysis** - Tokenizes source code into tokens
+- **Lexical Analysis** - Tokenizes Kyle source code into tokens
 - **Parsing** - Builds Abstract Syntax Tree (AST) using recursive descent
-- **Interpretation** - Executes AST nodes with basic environment management
+- **Interpretation** - Executes AST nodes with environment management
 - **Type System** - Simple typing with custom token and AST node definitions
+- **File Processing** - Direct execution of `.kyle` files with validation
 
 ## Architecture
 
@@ -19,7 +20,7 @@ This project implements a basic interpreter with:
 3. **Interpreter** (`Semantics/interpreter.py`) - Simple AST execution engine
 4. **Type Declarations** (`type_decl/`) - Basic token and AST node definitions
 5. **Configuration** (`configurables/decl.py`) - Parser configuration and error handling
-6. **Utilities** (`util/facilitators.py`) - StreamIterator for navigation
+6. **Utilities** (`util/`) - Multiple utility modules including StreamIterator, I/O helpers, and parser helpers
 
 ## Language Features
 
@@ -41,22 +42,24 @@ This project implements a basic interpreter with:
 ### Command Line Interface
 
 ```bash
-# Execute a source file with full demonstration
-python main.py sample.comp
+# Execute a Kyle source file
+python main.py sample.kyle
 
 # Interactive interpreter mode (no arguments)
 python main.py
 ```
 
+**File Validation**: The compiler only accepts `.kyle` files. Files with other extensions or multiple dots will be rejected with an error message.
+
 ### Sample Code
 
-```comp
+```kyle
 name = "george"
 age = 21
 
-if (age >= 18) {
+if (age >= 18){
     builtin_print("You are an adult")
-} otherwise {
+}otherwise{
     builtin_print("You are not an adult")
 }
 ```
@@ -141,25 +144,35 @@ def interpret_statement(self, stmt: Any) -> Any:
 
 ```
 Compiler/
-├── main.py              # Main entry point
-├── sample.comp          # Sample source code
+├── main.py              # Main entry point with file validation
+├── sample.kyle          # Sample Kyle source code
 ├── test.py              # Test file
-├── test_complex.comp    # Complex test file
+├── test_complex.comp    # Complex test file (legacy)
 ├── .gitignore           # Git ignore configuration
 ├── lexer/
+│   ├── __init__.py      # Package initialization
 │   └── lexer.py         # Basic tokenizer
 ├── parser/
-│   └── parser.py        # Recursive descent parser
+│   ├── __init__.py      # Package initialization
+│   ├── parser.py        # Recursive descent parser
+│   └── utils.py         # Parser utilities
 ├── Semantics/
 │   ├── __init__.py      # Package initialization
-│   └── interpreter.py   # Simple execution engine
+│   └── interpreter.py   # AST execution engine with function call support
 ├── type_decl/
+│   ├── __init__.py      # Package initialization
 │   ├── lexer_types.py   # TokenType enum and Token class
 │   └── parser_types.py  # AST node definitions
 ├── configurables/
+│   ├── __init__.py      # Package initialization
 │   └── decl.py          # Parser configuration
-└── util/
-    └── facilitators.py  # StreamIterator utility
+├── util/
+│   ├── __init__.py      # Package initialization
+│   ├── facilitators.py  # StreamIterator utility
+│   ├── iohelpers.py     # I/O utilities including colored output
+│   └── parser_helpers.py # Parser helper functions
+└── helpers/
+    └── __init__.py      # Helper package initialization
 ```
 
 ## Development Workflow
@@ -175,10 +188,10 @@ Compiler/
 ### Testing
 
 ```bash
-# Test with sample files (full demonstration)
-python main.py sample.comp
+# Test with sample Kyle file
+python main.py sample.kyle
 
-# Test with complex sample
+# Test with complex sample (legacy .comp file)
 python main.py test_complex.comp
 
 # Interactive testing
@@ -190,30 +203,37 @@ python main.py
 # exit
 ```
 
+**Note**: The compiler now validates file extensions and will only process `.kyle` files. Legacy `.comp` files may still work but are not recommended.
+
 ## Technical Achievements
 
 - **Basic Pipeline**: Simple lexer → parser → interpreter implementation
 - **Type Safety**: Basic typing throughout the pipeline
-- **Error Handling**: Simple error reporting
+- **Error Handling**: Enhanced error reporting with colored output
 - **Modular Design**: Separation of concerns across modules
+- **File Validation**: Strict .kyle file extension enforcement
+- **Function Call Support**: Enhanced function call interpretation with variable handling
 - **Educational Value**: Demonstrates interpreter principles
 
 ## Current Status
 
 ✅ **Functional** - Basic interpreter with execution
-✅ **Variable Management** - Simple environment handling
-✅ **Function Calls** - Basic built-in functions
+✅ **File Processing** - Direct .kyle file execution with validation
+✅ **Variable Management** - Environment handling with function call support
+✅ **Function Calls** - Enhanced built-in functions with variable arguments
 ✅ **Control Flow** - Simple if/otherwise statements
 ✅ **Type System** - Basic typing
-✅ **Error Handling** - Simple error reporting
+✅ **Error Handling** - Improved error reporting with colored output
+✅ **I/O Utilities** - Colored console output functions
 
 ## Limitations
 
 - **Performance**: Not optimized for production use
 - **Features**: Limited language constructs
-- **Error Handling**: Basic error messages
+- **Error Handling**: Basic error messages (though improved with colors)
 - **Type System**: Simple type checking
 - **Memory**: No memory optimization
+- **File Extension**: Strict enforcement may limit flexibility
 
 ## Future Enhancements
 
@@ -223,6 +243,7 @@ python main.py
 - **Better Error Messages**: More descriptive error reporting
 - **Type Checking**: Improved type validation
 - **Optimization**: Basic performance improvements
+- **Package Management**: Module system for larger programs
 
 ## License
 
