@@ -1,0 +1,8 @@
+name = "george"
+age = 21
+
+if (age >= 18){
+    builtin_print("You are an adult")
+}otherwise{
+    builtin_print("You are not an adult")
+}
