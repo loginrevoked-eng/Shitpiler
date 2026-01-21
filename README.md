@@ -1,26 +1,25 @@
 # Kyle Language Compiler
 
-A simple compiler/interpreter for the Kyle programming language (`.kyle` files). This is an educational project demonstrating basic interpreter implementation principles with a custom language syntax.
+A simple interpreter for the Kyle programming language (`.kyle` files).
 
 ## Overview
 
-This project implements a basic interpreter with:
-- **Lexical Analysis** - Tokenizes Kyle source code into tokens
-- **Parsing** - Builds Abstract Syntax Tree (AST) using recursive descent
-- **Interpretation** - Executes AST nodes with environment management
-- **Type System** - Simple typing with custom token and AST node definitions
-- **File Processing** - Direct execution of `.kyle` files with validation
+- **Lexical Analysis** - Tokenizes source code
+- **Parsing** - Builds AST using recursive descent
+- **Interpretation** - Executes AST nodes
+- **Type System** - Basic token and AST node definitions
+- **File Processing** - Direct execution of `.kyle` files
 
 ## Architecture
 
-### Core Components
+### Components
 
-1. **Lexer** (`lexer/lexer.py`) - Basic tokenizer using StreamIterator
-2. **Parser** (`parser/parser.py`) - Recursive descent parser with dispatch tables
-3. **Interpreter** (`Semantics/interpreter.py`) - Simple AST execution engine
-4. **Type Declarations** (`type_decl/`) - Basic token and AST node definitions
-5. **Configuration** (`configurables/decl.py`) - Parser configuration and error handling
-6. **Utilities** (`util/`) - Multiple utility modules including StreamIterator, I/O helpers, and parser helpers
+1. **Lexer** (`lexer/lexer.py`) - Tokenizer using StreamIterator
+2. **Parser** (`parser/parser.py`) - Recursive descent parser
+3. **Interpreter** (`Semantics/interpreter.py`) - AST execution engine
+4. **Type Declarations** (`type_decl/`) - Token and AST node definitions
+5. **Configuration** (`configurables/decl.py`) - Parser configuration
+6. **Utilities** (`util/`) - StreamIterator, I/O helpers, parser helpers
 
 ## Language Features
 
@@ -29,13 +28,13 @@ This project implements a basic interpreter with:
 - **Data Types**: Strings, Integers, Floats
 - **Control Flow**: `if/otherwise` statements
 - **Functions**: Basic built-in functions
-- **Expressions**: Simple comparison operations (`>=`, `<=`, `==`, `!=`, `>`, `<`)
+- **Expressions**: Comparison operations (`>=`, `<=`, `==`, `!=`, `>`, `<`)
 - **Function Calls**: `builtin_print("message")`, `builtin_print(variable)`
 
 ### Built-in Functions
-- `builtin_print` - Basic print function
-- `builtin_input` - Python's input function
-- `builtin_len`, `builtin_str`, `builtin_int`, `builtin_float` - Type conversion functions
+- `builtin_print` - Print function
+- `builtin_input` - Input function
+- `builtin_len`, `builtin_str`, `builtin_int`, `builtin_float` - Type conversion
 
 ## Usage
 
@@ -144,102 +143,94 @@ def interpret_statement(self, stmt: Any) -> Any:
 
 ```
 Compiler/
-├── main.py              # Main entry point with file validation
-├── sample.kyle          # Sample Kyle source code
-├── .gitignore           # Git ignore configuration
+├── main.py
+├── sample.kyle
+├── .gitignore
 ├── lexer/
-│   ├── __init__.py      # Package initialization
-│   └── lexer.py         # Basic tokenizer
+│   ├── __init__.py
+│   └── lexer.py
 ├── parser/
-│   ├── __init__.py      # Package initialization
-│   ├── parser.py        # Recursive descent parser
-│   └── utils.py         # Parser utilities
+│   ├── __init__.py
+│   ├── parser.py
+│   └── utils.py
 ├── Semantics/
-│   ├── __init__.py      # Package initialization
-│   └── interpreter.py   # AST execution engine with function call support
+│   ├── __init__.py
+│   └── interpreter.py
 ├── type_decl/
-│   ├── __init__.py      # Package initialization
-│   ├── lexer_types.py   # TokenType enum and Token class
-│   └── parser_types.py  # AST node definitions
+│   ├── __init__.py
+│   ├── lexer_types.py
+│   └── parser_types.py
 ├── configurables/
-│   ├── __init__.py      # Package initialization
-│   └── decl.py          # Parser configuration
+│   ├── __init__.py
+│   └── decl.py
 ├── util/
-│   ├── __init__.py      # Package initialization
-│   ├── facilitators.py  # StreamIterator utility
-│   ├── iohelpers.py     # I/O utilities including colored output
-│   └── parser_helpers.py # Parser helper functions
+│   ├── __init__.py
+│   ├── facilitators.py
+│   ├── iohelpers.py
+│   └── parser_helpers.py
 └── helpers/
-    └── __init__.py      # Helper package initialization
+    └── __init__.py
 ```
 
-## Development Workflow
+## Development
 
-### Adding New Language Features
+### Adding Features
 
-1. **Define Token Types** in `type_decl/lexer_types.py`
-2. **Create AST Nodes** in `type_decl/parser_types.py`
-3. **Implement Parser Methods** in `parser/parser.py`
-4. **Add Interpreter Logic** in `Semantics/interpreter.py`
-5. **Update Dispatch Tables** in `configurables/decl.py`
+1. Define token types in `type_decl/lexer_types.py`
+2. Create AST nodes in `type_decl/parser_types.py`
+3. Implement parser methods in `parser/parser.py`
+4. Add interpreter logic in `Semantics/interpreter.py`
+5. Update dispatch tables in `configurables/decl.py`
 
 ### Testing
 
 ```bash
-# Test with sample Kyle file
+# Test with sample file
 python main.py sample.kyle
 
-# Interactive testing
+# Interactive mode
 python main.py
-# Then try commands like:
-# cls = 32
-# builtin_print(cls)
-# env
-# exit
 ```
 
-**Note**: The compiler only accepts `.kyle` files. Test files and other extensions are ignored by git.
+## Technical Details
 
-## Technical Achievements
+- Basic lexer → parser → interpreter pipeline
+- Type safety throughout the pipeline
+- Error handling with colored output
+- Modular design with separated concerns
+- File validation for .kyle extensions
+- Function call interpretation with variable handling
 
-- **Basic Pipeline**: Simple lexer → parser → interpreter implementation
-- **Type Safety**: Basic typing throughout the pipeline
-- **Error Handling**: Enhanced error reporting with colored output
-- **Modular Design**: Separation of concerns across modules
-- **File Validation**: Strict .kyle file extension enforcement
-- **Function Call Support**: Enhanced function call interpretation with variable handling
-- **Educational Value**: Demonstrates interpreter principles
+## Status
 
-## Current Status
-
-✅ **Functional** - Basic interpreter with execution
-✅ **File Processing** - Direct .kyle file execution with validation
-✅ **Variable Management** - Environment handling with function call support
-✅ **Function Calls** - Enhanced built-in functions with variable arguments
-✅ **Control Flow** - Simple if/otherwise statements
-✅ **Type System** - Basic typing
-✅ **Error Handling** - Improved error reporting with colored output
-✅ **I/O Utilities** - Colored console output functions
+✅ Functional interpreter
+✅ File processing with validation
+✅ Variable management
+✅ Function calls
+✅ Control flow
+✅ Type system
+✅ Error handling
+✅ I/O utilities
 
 ## Limitations
 
-- **Performance**: Not optimized for production use
-- **Features**: Limited language constructs
-- **Error Handling**: Basic error messages (though improved with colors)
-- **Type System**: Simple type checking
-- **Memory**: No memory optimization
-- **File Extension**: Strict enforcement may limit flexibility
+- Not optimized for production
+- Limited language constructs
+- Basic error messages
+- Simple type checking
+- No memory optimization
+- Strict file extension enforcement
 
 ## Future Enhancements
 
-- **User-Defined Functions**: Basic function definitions
-- **Loop Constructs**: Simple while/for loops
-- **Data Structures**: Basic array/list support
-- **Better Error Messages**: More descriptive error reporting
-- **Type Checking**: Improved type validation
-- **Optimization**: Basic performance improvements
-- **Package Management**: Module system for larger programs
+- User-defined functions
+- Loop constructs
+- Data structures
+- Better error messages
+- Improved type checking
+- Performance optimizations
+- Package management
 
 ## License
 
-Educational project demonstrating basic interpreter implementation.
+Educational project.
