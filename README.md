@@ -146,8 +146,6 @@ def interpret_statement(self, stmt: Any) -> Any:
 Compiler/
 ├── main.py              # Main entry point with file validation
 ├── sample.kyle          # Sample Kyle source code
-├── test.py              # Test file
-├── test_complex.comp    # Complex test file (legacy)
 ├── .gitignore           # Git ignore configuration
 ├── lexer/
 │   ├── __init__.py      # Package initialization
@@ -191,9 +189,6 @@ Compiler/
 # Test with sample Kyle file
 python main.py sample.kyle
 
-# Test with complex sample (legacy .comp file)
-python main.py test_complex.comp
-
 # Interactive testing
 python main.py
 # Then try commands like:
@@ -203,7 +198,7 @@ python main.py
 # exit
 ```
 
-**Note**: The compiler now validates file extensions and will only process `.kyle` files. Legacy `.comp` files may still work but are not recommended.
+**Note**: The compiler only accepts `.kyle` files. Test files and other extensions are ignored by git.
 
 ## Technical Achievements
 
