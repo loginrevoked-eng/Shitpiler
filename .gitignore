@@ -1,9 +1,11 @@
 **/__pycache__/
 test.*
 *.comp
+*.md
 !README.md
 main.spec
 dist/*
 build/*
 __pycache__/*
 filesa.txt
+file.txt
