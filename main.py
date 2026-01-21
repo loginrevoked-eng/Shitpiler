@@ -10,6 +10,19 @@ from Semantics import Interpreter
 import sys
 import time
 
+
+
+
+TradeMark = """
+Author: kyle monroe
+email: loginrevoked@gmail.com\n
+[ Shitpiler v0.0.1- yet to be released ]
+\nDESCRIPTION:
+    A high-latency, low-efficiency compiler
+    built for maximum disgust and gags (  please dont look at the source code :-(  ).
+\n'It works on my machine, so it's a you problem.'\n
+"""
+
 def demonstrate_interpretation(filename):
     """Demonstrate the complete interpretation process"""
     print("=" * 60)
@@ -79,7 +92,7 @@ def demonstrate_interpretation(filename):
 
 def interactive_mode():
     """Interactive interpreter mode"""
-    print("INTERACTIVE MODE")
+    print(TradeMark)
     print("Enter 'exit' to quit, 'help' for commands")
     print("-" * 40)
     

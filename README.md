@@ -1,45 +1,51 @@
 # Real-Time Interpreter System
 
-A complete compiler/interpreter pipeline that converts custom source code to Python equivalent and executes it in real-time.
+A simple compiler/interpreter pipeline that converts custom source code to Python and executes it. This is an educational project demonstrating basic interpreter implementation principles.
+
+## Overview
+
+This project implements a basic interpreter with:
+- **Lexical Analysis** - Tokenizes source code into tokens
+- **Parsing** - Builds Abstract Syntax Tree (AST) using recursive descent
+- **Interpretation** - Executes AST nodes with basic environment management
+- **Type System** - Simple typing with custom token and AST node definitions
 
 ## Architecture
 
-### Components
+### Core Components
 
-1. **Lexer** (`lexer/lexer.py`) - Tokenizes source code
-2. **Parser** (`parser/parser.py`) - Builds Abstract Syntax Tree (AST)
-3. **Interpreter** (`Semantics/interpreter.py`) - Executes AST in real-time
-4. **Type Declarations** (`type_decl/`) - Defines tokens and AST nodes
-5. **Configuration** (`configurables/`) - Parser configuration
+1. **Lexer** (`lexer/lexer.py`) - Basic tokenizer using StreamIterator
+2. **Parser** (`parser/parser.py`) - Recursive descent parser with dispatch tables
+3. **Interpreter** (`Semantics/interpreter.py`) - Simple AST execution engine
+4. **Type Declarations** (`type_decl/`) - Basic token and AST node definitions
+5. **Configuration** (`configurables/decl.py`) - Parser configuration and error handling
+6. **Utilities** (`util/facilitators.py`) - StreamIterator for navigation
 
-## Features
+## Language Features
 
-### Language Support
+### Supported Constructs
 - **Variables**: `name = "Alice"`, `age = 25`
 - **Data Types**: Strings, Integers, Floats
 - **Control Flow**: `if/otherwise` statements
-- **Functions**: Built-in functions (`builtin_print`, `builtin_input`, etc.)
-- **Expressions**: Comparison operations (`>=`, `<=`, `==`, `!=`, `>`, `<`)
+- **Functions**: Basic built-in functions
+- **Expressions**: Simple comparison operations (`>=`, `<=`, `==`, `!=`, `>`, `<`)
+- **Function Calls**: `builtin_print("message")`, `builtin_print(variable)`
 
-### Real-Time Execution
-- **Immediate Execution**: Code is parsed and executed immediately
-- **Environment Management**: Variables stored in runtime environment
-- **Built-in Functions**: Access to Python's built-in functions
-- **Error Handling**: Comprehensive error reporting
+### Built-in Functions
+- `builtin_print` - Basic print function
+- `builtin_input` - Python's input function
+- `builtin_len`, `builtin_str`, `builtin_int`, `builtin_float` - Type conversion functions
 
 ## Usage
 
-### Command Line
+### Command Line Interface
 
 ```bash
-# Execute a source file
+# Execute a source file with full demonstration
 python main.py sample.comp
 
-# Run demonstration
-python demo.py sample.comp
-
-# Interactive mode
-python demo.py
+# Interactive interpreter mode (no arguments)
+python main.py
 ```
 
 ### Sample Code
@@ -55,7 +61,7 @@ if (age >= 18) {
 }
 ```
 
-### Output
+### Execution Pipeline
 
 ```
 --- Tokens ---
@@ -71,113 +77,153 @@ IfNode(condition="Comparison(age >= IntegerNode(value='18'))", ...)
 
 --- Execution ---
 You are an adult
+
+Environment State:
+name = george (str)
+age = 21 (int)
 ```
 
 ## Implementation Details
 
+### Lexer Architecture
+
+Basic lexer using **StreamIterator** pattern:
+- **Token Types**: Standard TokenType enum with common tokens
+- **Reserved Keywords**: Basic keyword recognition
+- **Error Handling**: Simple error reporting
+
+### Parser Architecture
+
+Recursive descent parser with **dispatch table**:
+- **Dispatch Table**: Maps token types to parser methods
+- **AST Nodes**: Basic AST node hierarchy
+- **Error Recovery**: Basic error handling
+
 ### Interpreter Architecture
 
-The interpreter uses a **Visitor Pattern** to traverse the AST:
+Simple **Visitor Pattern** implementation:
+- **Environment Management**: Dictionary-based variable storage
+- **Type Handling**: Basic type conversion
+- **Function Calls**: AST node-based function calls
+
+### Key Classes
 
 ```python
+# Basic interpreter loop
 class Interpreter:
     def interpret(self, program: ProgramNode) -> Any:
         for stmt in program.Toplevel:
             self.interpret_statement(stmt)
-    
-    def interpret_statement(self, stmt: Any) -> Any:
-        if isinstance(stmt, AssignmentNode):
-            return self.interpret_assignment(stmt)
-        elif isinstance(stmt, IfNode):
-            return self.interpret_if(stmt)
-        # ... more statement types
-```
 
-### Environment Management
-
-Variables are stored in a dictionary-based environment:
-
-```python
+# Simple environment management
 self.environment = {
     'name': 'Alice',
     'age': 25,
-    'builtin_print': <function>,
-    # ...
+    'builtin_print': <method>,
 }
+
+# Basic AST node handling
+def interpret_statement(self, stmt: Any) -> Any:
+    if isinstance(stmt, AssignmentNode):
+        return self.interpret_assignment(stmt)
+    elif isinstance(stmt, IfNode):
+        return self.interpret_if(stmt)
 ```
 
-### Expression Evaluation
+## Performance Characteristics
 
-Expressions are evaluated recursively:
-
-```python
-def interpret_expression(self, expr: Any) -> Any:
-    if isinstance(expr, str):
-        if expr in self.environment:
-            return self.environment[expr]  # Variable lookup
-        elif expr.startswith('"'):
-            return expr[1:-1]  # String literal
-    # ... more expression types
-```
-
-## Performance
-
-The interpreter demonstrates:
-- **Fast Parsing**: AST built in milliseconds
-- **Efficient Execution**: Direct interpretation without intermediate compilation
-- **Memory Management**: Automatic garbage collection via Python
-
-## Extending the Language
-
-### Adding New Statement Types
-
-1. Define AST node in `type_decl/parser_types.py`
-2. Add parser method in `parser/parser.py`
-3. Add interpreter method in `Semantics/interpreter.py`
-
-### Adding New Built-in Functions
-
-```python
-def setup_builtins(self):
-    self.environment['builtin_my_func'] = self.my_function
-
-def my_function(self, *args):
-    # Custom implementation
-    pass
-```
+- **Parsing Speed**: Basic AST construction
+- **Execution Speed**: Simple interpretation without optimization
+- **Memory Usage**: Basic Python garbage collection
+- **Scalability**: Handles simple programs and expressions
 
 ## File Structure
 
 ```
 Compiler/
 ├── main.py              # Main entry point
-├── demo.py              # Demonstration script
 ├── sample.comp          # Sample source code
+├── test.py              # Test file
+├── test_complex.comp    # Complex test file
+├── .gitignore           # Git ignore configuration
 ├── lexer/
-│   └── lexer.py         # Tokenizer
+│   └── lexer.py         # Basic tokenizer
 ├── parser/
-│   └── parser.py        # AST builder
+│   └── parser.py        # Recursive descent parser
 ├── Semantics/
-│   ├── __init__.py
-│   └── interpreter.py   # Runtime executor
+│   ├── __init__.py      # Package initialization
+│   └── interpreter.py   # Simple execution engine
 ├── type_decl/
-│   ├── lexer_types.py   # Token definitions
+│   ├── lexer_types.py   # TokenType enum and Token class
 │   └── parser_types.py  # AST node definitions
 ├── configurables/
 │   └── decl.py          # Parser configuration
 └── util/
-    └── facilitators.py  # Utility classes
+    └── facilitators.py  # StreamIterator utility
 ```
+
+## Development Workflow
+
+### Adding New Language Features
+
+1. **Define Token Types** in `type_decl/lexer_types.py`
+2. **Create AST Nodes** in `type_decl/parser_types.py`
+3. **Implement Parser Methods** in `parser/parser.py`
+4. **Add Interpreter Logic** in `Semantics/interpreter.py`
+5. **Update Dispatch Tables** in `configurables/decl.py`
+
+### Testing
+
+```bash
+# Test with sample files (full demonstration)
+python main.py sample.comp
+
+# Test with complex sample
+python main.py test_complex.comp
+
+# Interactive testing
+python main.py
+# Then try commands like:
+# cls = 32
+# builtin_print(cls)
+# env
+# exit
+```
+
+## Technical Achievements
+
+- **Basic Pipeline**: Simple lexer → parser → interpreter implementation
+- **Type Safety**: Basic typing throughout the pipeline
+- **Error Handling**: Simple error reporting
+- **Modular Design**: Separation of concerns across modules
+- **Educational Value**: Demonstrates interpreter principles
+
+## Current Status
+
+✅ **Functional** - Basic interpreter with execution
+✅ **Variable Management** - Simple environment handling
+✅ **Function Calls** - Basic built-in functions
+✅ **Control Flow** - Simple if/otherwise statements
+✅ **Type System** - Basic typing
+✅ **Error Handling** - Simple error reporting
+
+## Limitations
+
+- **Performance**: Not optimized for production use
+- **Features**: Limited language constructs
+- **Error Handling**: Basic error messages
+- **Type System**: Simple type checking
+- **Memory**: No memory optimization
 
 ## Future Enhancements
 
-- **Type System**: Static type checking
-- **Functions**: User-defined functions
-- **Loops**: while/for loop support
-- **Arrays/Lists**: Data structure support
-- **Modules**: Import/export system
-- **Optimization**: Bytecode compilation
+- **User-Defined Functions**: Basic function definitions
+- **Loop Constructs**: Simple while/for loops
+- **Data Structures**: Basic array/list support
+- **Better Error Messages**: More descriptive error reporting
+- **Type Checking**: Improved type validation
+- **Optimization**: Basic performance improvements
 
 ## License
 
-This project demonstrates a complete interpreter implementation for educational purposes.
+Educational project demonstrating basic interpreter implementation.
