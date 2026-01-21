@@ -6,3 +6,4 @@ main.spec
 dist/*
 build/*
 __pycache__/*
+file.txt
