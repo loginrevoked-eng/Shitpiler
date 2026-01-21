@@ -16,3 +16,15 @@ def panic(message,code=1):
         f" {message}\n[    Exited with code {code} :-<    ]\n"
     )
     sys.exit(code)
+def fmt_c(msg,color="white"):
+    color_map = {
+        "green":colorama.Fore.GREEN,
+        "red":colorama.Fore.RED,
+        "blue":colorama.Fore.BLUE,
+        "yellow":colorama.Fore.YELLOW,
+        "magenta":colorama.Fore.MAGENTA,
+        "cyan":colorama.Fore.CYAN,
+        "white":colorama.Fore.WHITE
+    }
+    return f"{color_map.get(color.lower(),color_map["white"])}{msg}{color_map["white"]}"
+    

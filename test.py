@@ -1,82 +1,148 @@
-from util.facilitators import StreamIterator
-from dataclasses import dataclass
-from enum import Enum
+#!/usr/bin/env python3
+"""
+Real-time Interpreter Demo
+Shows how the compiler converts source code to Python and executes it
+"""
+
+from lexer import Lexer
+from parser import Parser
+from Semantics import Interpreter
+import sys
+import time
 
 
-class TokenType(Enum):
-    IDENTIFIER = "identifier"
-    STRING_LITERAL = "string literal"
-    INTEGER_LITERAL = "int literal"
-    ASSIGNMENT = "="
-    LPAREN = "(" 
-    RPAREN = ")"
-
-@dataclass
-class Token:
-    value : str
-    type : TokenType
-@dataclass
-class ExprNode:
-    value : Token
-@dataclass
-class AssignNode:
-    lvalue : ExprNode
-    rvalue : ExprNode
 
 
-class Parser:
-    def __init__(self,token_stream):
-        self.tokens = token_stream
-        self.token_stream = StreamIterator(self.tokens)
-    def parse(self):
-        curr  = self.current()
-        match curr.type:
-            case TokenType.IDENTIFIER:
-                if self.precceds(TokenType.ASSIGNMENT):
-                    self.expect(TokenType.ASSIGNMENT)
-                    return AssignNode(lvalue=ExprNode(value=curr),rvalue=self.parse_expression())
-            case _:
-                raise Exception("Invalid syntax")
-    def current(self):
-        return self.token_stream.current()
-    def precceds(self,token_type:TokenType):
-        return self.token_stream.peek().type == token_type
-    def follows(self,token_type:TokenType):
-        return self.token_stream.peek_back().type == token_type
-    def expect(self,*args):
-        next = self.token_stream.peek()
-        for type in args:
-            if next.type == type:
-                self.token_stream.next()
-                self.token_stream.next()
-                return
-        raise Exception("Invalid syntax")
-    def parse_expression(self):
-        curr = self.current()
-        match curr.type:
-            case TokenType.IDENTIFIER:
-                return ExprNode(value=curr)
-            case TokenType.LPAREN:
-                self.expect(TokenType.STRING_LITERAL, TokenType.INTEGER_LITERAL)
-                curr = self.current()
-                self.expect(TokenType.RPAREN)
-                return ExprNode(value=curr)
-            case TokenType.STRING_LITERAL:
-                return ExprNode(value=curr)
-            case TokenType.INTEGER_LITERAL:
-                return ExprNode(value=curr)
-            case _:
-                raise Exception("Invalid syntax")
+TradeMark = """
+Author: kyle monroe
+email: loginrevoked@gmail.com\n
+[ Shitpiler v0.0.1- yet to be released ]
+\nDESCRIPTION:
+    A high-latency, low-efficiency compiler
+    built for maximum disgust and gags (  please dont look at the source code :-(  ).
+\n'It works on my machine, so it's a you problem.'\n
+"""
 
-
-test = [
-    Token(value="name",type=TokenType.IDENTIFIER),
-    Token(value="=",type=TokenType.ASSIGNMENT),
-    Token(value="george",type=TokenType.STRING_LITERAL),
-]
-
-parser = Parser(test)
-print(parser.parse())
+def demonstrate_interpretation(filename):
+    """Demonstrate the complete interpretation process"""
+    print("=" * 60)
+    print(f"REAL-TIME INTERPRETER DEMO: {filename}")
+    print("=" * 60)
     
-                    
+    # Read source code
+    with open(filename, "r") as f:
+        source_code = f.read()
+    
+    print(f"\nSOURCE CODE:")
+    print("-" * 40)
+    print(source_code)
+    
+    # Lexical Analysis
+    print(f"\nLEXICAL ANALYSIS:")
+    print("-" * 40)
+    lexer = Lexer(source_code)
+    tok_iter, tokens = lexer.tokenize()
+    
+    token_count = 0
+    while tok_iter.has_next():
+        token = tok_iter.current()
+        print(f"  {token}")
+        token_count += 1
+        tok_iter.next()
+    
+    print(f"\nGenerated {token_count} tokens")
+    
+    # Parsing
+    print(f"\nPARSING (Building AST):")
+    print("-" * 40)
+    parser = Parser(tokens)
+    start_time = time.time()
+    program = parser.parse()
+    parse_time = time.time() - start_time
+    
+    print(f"AST built in {parse_time:.4f} seconds")
+    
+    # Show AST structure
+    print(f"\nABSTRACT SYNTAX TREE:")
+    print("-" * 40)
+    for i, stmt in enumerate(program.Toplevel, 1):
+        print(f"  {i}. {stmt}")
+    
+    # Interpretation (Real-time execution)
+    print(f"\nREAL-TIME EXECUTION:")
+    print("-" * 40)
+    interpreter = Interpreter()
+    
+    print("Executing program...")
+    start_time = time.time()
+    result = interpreter.interpret(program)
+    exec_time = time.time() - start_time
+    
+    print(f"Program executed in {exec_time:.4f} seconds")
+    
+    # Show environment state
+    print(f"\nENVIRONMENT STATE:")
+    print("-" * 40)
+    for var, value in interpreter.environment.items():
+        if not var.startswith('builtin_'):
+            print(f"  {var} = {value} ({type(value).__name__})")
+    
+    print(f"\nDEMONSTRATION COMPLETE!")
+    print("=" * 60)
+
+def interactive_mode():
+    """Interactive interpreter mode"""
+    print(TradeMark)
+    print("Enter 'exit' to quit, 'help' for commands")
+    print("-" * 40)
+    
+    interpreter = Interpreter()
+    
+    while True:
+        try:
+            code = input(">>> ")
+            
+            if code.lower() == 'exit':
+                break
+            elif code.lower() == 'help':
+                print("Available commands:")
+                print("  exit  - Exit interactive mode")
+                print("  help  - Show this help")
+                print("  env   - Show environment variables")
+                print("  clear - Clear environment")
+                continue
+            elif code.lower() == 'env':
+                print("Environment:")
+                for var, value in interpreter.environment.items():
+                    print(f"  {var} = {value}")
+                continue
+            elif code.lower() == 'clear':
+                interpreter = Interpreter()
+                print("Environment cleared")
+                continue
+            
+            # Lex, parse, and interpret the code
+            lexer = Lexer(code)
+            tok_iter, tokens = lexer.tokenize()
+            
+            parser = Parser(tokens)
+            program = parser.parse()
+            
+            result = interpreter.interpret(program)
+            
+            if result:
+                print(f"Result: {result}")
                 
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        # File mode
+        demonstrate_interpretation(sys.argv[1])
+    else:
+        # Interactive mode
+        interactive_mode()

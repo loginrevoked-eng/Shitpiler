@@ -6,13 +6,15 @@ Shows how the compiler converts source code to Python and executes it
 
 from lexer import Lexer
 from parser import Parser
-from Semantics import Interpreter
+from Semantics import Interpreter, interpreter
+from util.iohelpers import fmt_c
 import sys
-import time
+import os
 
 
-
-
+INDENT = " " * 4
+SUPPORTED_FILE_EXTENSION = ".kyle"
+EXAMPLE_FILENAME = "kyle-is-cool{}".format(SUPPORTED_FILE_EXTENSION)
 TradeMark = """
 Author: kyle monroe
 email: loginrevoked@gmail.com\n
@@ -23,75 +25,29 @@ email: loginrevoked@gmail.com\n
 \n'It works on my machine, so it's a you problem.'\n
 """
 
-def demonstrate_interpretation(filename):
-    """Demonstrate the complete interpretation process"""
-    print("=" * 60)
-    print(f"REAL-TIME INTERPRETER DEMO: {filename}")
-    print("=" * 60)
-    
-    # Read source code
-    with open(filename, "r") as f:
-        source_code = f.read()
-    
-    print(f"\nSOURCE CODE:")
-    print("-" * 40)
-    print(source_code)
-    
-    # Lexical Analysis
-    print(f"\nLEXICAL ANALYSIS:")
-    print("-" * 40)
-    lexer = Lexer(source_code)
-    tok_iter, tokens = lexer.tokenize()
-    
-    token_count = 0
-    while tok_iter.has_next():
-        token = tok_iter.current()
-        print(f"  {token}")
-        token_count += 1
-        tok_iter.next()
-    
-    print(f"\nGenerated {token_count} tokens")
-    
-    # Parsing
-    print(f"\nPARSING (Building AST):")
-    print("-" * 40)
-    parser = Parser(tokens)
-    start_time = time.time()
-    program = parser.parse()
-    parse_time = time.time() - start_time
-    
-    print(f"AST built in {parse_time:.4f} seconds")
-    
-    # Show AST structure
-    print(f"\nABSTRACT SYNTAX TREE:")
-    print("-" * 40)
-    for i, stmt in enumerate(program.Toplevel, 1):
-        print(f"  {i}. {stmt}")
-    
-    # Interpretation (Real-time execution)
-    print(f"\nREAL-TIME EXECUTION:")
-    print("-" * 40)
-    interpreter = Interpreter()
-    
-    print("Executing program...")
-    start_time = time.time()
-    result = interpreter.interpret(program)
-    exec_time = time.time() - start_time
-    
-    print(f"Program executed in {exec_time:.4f} seconds")
-    
-    # Show environment state
-    print(f"\nENVIRONMENT STATE:")
-    print("-" * 40)
-    for var, value in interpreter.environment.items():
-        if not var.startswith('builtin_'):
-            print(f"  {var} = {value} ({type(value).__name__})")
-    
-    print(f"\nDEMONSTRATION COMPLETE!")
-    print("=" * 60)
+def process_file(filename):
+    try:
+        with open(filename, "r",encoding="utf-8") as f:
+            source_code = f.read()
+        try:
+            lexer = Lexer(source_code)
+            tok_iter, tokens = lexer.tokenize()
+            
+            parser = Parser(tokens)
+            program = parser.parse()
+            interpreter = Interpreter()
+            #print(INDENT,end="",flush=True)
+            result = interpreter.interpret(program)
+            print(result)
+        except Exception as e:
+            print(f"\n{INDENT}{e}")
+
+    except FileNotFoundError:
+        print(f"{INDENT}Buddy, that file doesn't exist! give me something located in [{os.getcwd()}]")
+    except Exception as e:
+        print(f"{INDENT}Error processing file: {e}")
 
 def interactive_mode():
-    """Interactive interpreter mode"""
     print(TradeMark)
     print("Enter 'exit' to quit, 'help' for commands")
     print("-" * 40)
@@ -141,8 +97,10 @@ def interactive_mode():
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        # File mode
-        demonstrate_interpretation(sys.argv[1])
+        filename = sys.argv[1]
+        if not filename.endswith(".kyle") or filename.count(".") > 1:
+            print(f"{INDENT}Buddy, that's not a valid {fmt_c(repr(SUPPORTED_FILE_EXTENSION), 'green')} file rename it to something like < {fmt_c(repr(EXAMPLE_FILENAME), 'green')} >")
+            sys.exit()
+        process_file(sys.argv[1])
     else:
-        # Interactive mode
         interactive_mode()
